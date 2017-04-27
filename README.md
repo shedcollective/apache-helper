@@ -6,7 +6,7 @@ A simple tool for managing Apache; works out the fiddly bits so you don't need t
 
 ### Using Homebrew
 1. Tap Nails using `brew tap shedcollective/utilities`
-2. Install using `brew install apache`
+2. Install using `brew install shedcollective/utilities/apache`
 3. Update as normal using `brew update && brew upgrade`
 
 ### Manually
