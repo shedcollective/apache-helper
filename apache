@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+VERSION='1.0.0'
+if [[ $@ = "config" ]]
+then
+    # @todo - Better approach to finding paths?
+    CONFIG_FILE=$(sudo apachectl -V | grep SERVER_CONFIG_FILE | cut -c25- | rev | cut -c2- | rev);
+    sudo "${EDITOR:-vi}" "$CONFIG_FILE"
+elif [[ $@ = "restart" ]]
+then
+    command sudo apachectl -k restart
+elif [[ $@ = "test" ]]
+then
+    command sudo apachectl configtest
+elif [[ $@ = "error" ]]
+then
+    # @todo - Better approach to extracting this info, account for different blank spaces etc
+    CONFIG_FILE=$(sudo apachectl -V | grep SERVER_CONFIG_FILE | cut -c25- | rev | cut -c2- | rev);
+    LOG_FILE=$(grep '^ErrorLog' "$CONFIG_FILE" | cut -c11- | rev | cut -c2- | rev)
+    command tail -f "$LOG_FILE"
+elif [[ $@ = "access" ]]
+then
+    # @todo - Better approach to extracting this info, account for different blank spaces etc
+    CONFIG_FILE=$(sudo apachectl -V | grep SERVER_CONFIG_FILE | cut -c25- | rev | cut -c2- | rev);
+    LOG_FILE=$(grep '^    CustomLog' "$CONFIG_FILE" | cut -c16- | rev | cut -c9- | rev)
+    command tail -f "$LOG_FILE"
+elif [[ $@ = "help" ]]
+then
+    echo "";
+    echo "Apache Helper $VERSION"
+    echo "";
+    echo "Usage: apache [command]";
+    echo "";
+    echo "config  - Opens Apache's configuration file in your default editor"
+    echo "test    - Tests Apache's config"
+    echo "restart - Restarts Apache (using -k)"
+    echo "error   - Opens the error log (using tail -f)"
+    echo "access  - Opens the access log (using tail -f)"
+    echo "help    - Prints this help screen"
+    echo ".*      - Passed directly through to sudo apachectl"
+    echo "";
+else
+    command sudo apachectl "$@"
+fi
